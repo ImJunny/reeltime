@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import api from '@/lib/api'
+import api from '@/utils/api'
 import { Play, PlayCircle } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 
@@ -15,10 +15,7 @@ function onMouseLeave() {
 
 // Fetch top movies from TMDB
 async function fetchTopMovies() {
-  const apiKey = import.meta.env.VITE_TMDB_API_KEY
-  const res = await api.get(
-    `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&language=en-US&page=1`,
-  )
+  const res = await api.get('api/public/tmdb/top-rated-movies')
 
   topMovies.value = res.data.results
 }
@@ -76,7 +73,7 @@ onMounted(() => {
           ]"
         />
       </div>
-      <div class="bg-surface-300 p-4 h-24">
+      <div class="bg-surface-700 p-4 h-24">
         <p class="font-bold text-sm line-clamp-2">{{ movie.title }}</p>
         <span class="text-sm">{{
           movie.release_date ? movie.release_date.slice(0, 4) : 'N/A'

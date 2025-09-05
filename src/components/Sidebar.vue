@@ -20,15 +20,15 @@ function goTo(link) {
 </script>
 
 <template>
-  <aside class="bg-surface-400 min-w-64">
+  <aside class="bg-surface-800 min-w-64">
     <ul class="p-4">
       <template v-for="[sectionKey, sectionLinks] in Object.entries(links)" :key="sectionKey">
         <li
           v-for="link in sectionLinks"
           :key="link.text"
           :class="[
-            'hover:bg-surface-300 transition-all duration-200 flex rounded-sm px-4 py-3 items-center gap-4 cursor-pointer',
-            { 'bg-surface-300': $route.path === link.to },
+            'hover:bg-surface-700 transition-all duration-200 flex rounded-sm px-4 py-3 items-center gap-4 cursor-pointer',
+            { 'bg-surface-700': $route.path === link.to },
           ]"
           @click="goTo(link)"
         >

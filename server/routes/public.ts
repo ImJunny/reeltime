@@ -1,9 +1,17 @@
 import { Hono } from 'hono'
 import { getStreamUrl } from '../procedures/public/stream'
-import { callback } from '../procedures/public/auth'
+import { callback, isAuthenticated, logout } from '../procedures/public/auth'
+import { getTopRatedMovies } from '../procedures/public/tmdb'
 
 // Public API routes
 export const streamRoute = new Hono().get('/url/:id', getStreamUrl)
-export const authRoute = new Hono().get('/callback', callback)
+export const authRoute = new Hono()
+  .get('/callback', callback)
+  .get('/is-authenticated', isAuthenticated)
+  .post('/logout', logout)
+export const tmdbRoute = new Hono().get('/top-rated-movies', getTopRatedMovies)
 
-export const publicApi = new Hono().route('/stream', streamRoute).route('/auth', authRoute)
+export const publicApi = new Hono()
+  .route('/stream', streamRoute)
+  .route('/auth', authRoute)
+  .route('/tmdb', tmdbRoute)

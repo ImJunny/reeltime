@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import VideoPlayer from '@/components/VideoPlayer.vue'
-import api from '@/lib/api'
+import api from '@/utils/api'
 import { onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
 

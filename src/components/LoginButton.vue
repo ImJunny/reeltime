@@ -1,5 +1,5 @@
 <script setup>
-import api from '@/lib/api'
+import { useAuthStore } from '@/lib/stores/auth'
 import Button from 'primevue/button'
 import { onMounted } from 'vue'
 
@@ -11,12 +11,8 @@ onMounted(() => {
     scope: 'openid email',
     ux_mode: 'redirect',
     redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
-    callback: async (response) => {
-      console.log('Auth code:', response.code)
-      const res = await api.post('/api/public/auth/exchange-code', {
-        code: response.code,
-      })
-      console.log(res)
+    callback: async (res) => {
+      await useAuthStore().login(res.code)
     },
   })
 })
