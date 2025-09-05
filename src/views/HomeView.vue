@@ -14,7 +14,7 @@ function onMouseLeave() {
 }
 
 async function fetchTopMovies() {
-  const res = await api.get('api/public/tmdb/popular-movies')
+  const res = await api.get('api/tmdb/popular-movies')
 
   topMovies.value = res.data.results
 }

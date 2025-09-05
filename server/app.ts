@@ -2,8 +2,8 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-import { publicApi } from './routes/public.ts'
-import { protectedApi } from './routes/protected.ts'
+import { getStreamUrl } from './procedures/stream.ts'
+import { getPopularMovies, getTopRatedMovies } from './procedures/tmdb.ts'
 
 // App uses logger for debugging and CORS for cross-origin requests with 5173
 // Mount public and protected APIs
@@ -16,8 +16,13 @@ const app = new Hono()
     }),
   )
   .basePath('/api')
-  .route('/public', publicApi)
-  .route('/protected', protectedApi)
+
+export const streamRoute = new Hono().get('/url/:id', getStreamUrl)
+export const tmdbRoute = new Hono()
+  .get('/top-rated-movies', getTopRatedMovies)
+  .get('/popular-movies', getPopularMovies)
+
+app.route('/stream', streamRoute).route('/tmdb', tmdbRoute)
 
 export default app
 export type ApiRoutes = typeof app

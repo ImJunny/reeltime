@@ -4,7 +4,6 @@ import router from './router'
 import PrimeVue from 'primevue/config'
 import { themePreset } from './lib/themePreset'
 import { createPinia } from 'pinia'
-import { useAuthStore } from './lib/stores/auth'
 import Aura from '@primeuix/themes/aura'
 
 const app = createApp(App)
@@ -24,9 +23,8 @@ app.use(PrimeVue, {
 })
 document.documentElement.classList.add('my-app-dark')
 
-// Initialize Pinia and auth store
+// Initialize Pinia
 app.use(createPinia())
-await useAuthStore().init()
 
 // Mount app
 app.mount('#app')

@@ -12,7 +12,7 @@ const partyId = route.params.id
 const streamUrl = ref('')
 
 async function getStreamUrl() {
-  const res = await api.get(`/api/public/stream/url/${partyId}`, {
+  const res = await api.get(`/api/stream/url/${partyId}`, {
     signal: controller.signal,
   })
   const url = res.data.streamUrl

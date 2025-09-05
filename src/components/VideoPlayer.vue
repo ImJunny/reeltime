@@ -67,7 +67,7 @@ watchEffect(() => {
   if (socketStore.timestamp) {
     const diff1 = Math.abs(videoRef.value.currentTime - socketStore.timestamp)
     const diff2 = Math.abs(lastSyncedTime - socketStore.timestamp)
-    if (diff1 > 0.5 && diff2 > 0.1) {
+    if (diff1 > 0.3 && diff2 > 0.1) {
       console.log('backed')
       isProgrammaticSeek = true // mark this as programmatic
 

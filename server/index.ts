@@ -11,7 +11,6 @@ const server = serve({
   hostname: HOSTNAME,
 })
 
-// Attach Socket.IO
 const io = new Server(server, {
   cors: {
     origin: 'http://127.0.0.1:5173',
@@ -30,8 +29,13 @@ io.on('connection', (socket) => {
   socket.on('disconnecting', () => {
     socket.rooms.forEach((room) => {
       if (room !== socket.id) {
-        const roomSockets = io.sockets.adapter.rooms.get(room)
-        if (!roomSockets || roomSockets.size === 0) {
+        const roomSockets = new Set(io.sockets.adapter.rooms.get(room) || [])
+        roomSockets.delete(socket.id)
+
+        console.log('disconnecting')
+        io.to(room).emit('room clients', Array.from(roomSockets))
+
+        if (roomSockets.size === 0) {
           console.log(`Room ${room} is now empty`)
         }
       }
