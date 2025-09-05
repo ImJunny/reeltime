@@ -13,9 +13,8 @@ function onMouseLeave() {
   hoveredIndex.value = null
 }
 
-// Fetch top movies from TMDB
 async function fetchTopMovies() {
-  const res = await api.get('api/public/tmdb/top-rated-movies')
+  const res = await api.get('api/public/tmdb/popular-movies')
 
   topMovies.value = res.data.results
 }

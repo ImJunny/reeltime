@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import VideoPlayer from '@/components/VideoPlayer.vue'
 import api from '@/utils/api'
-import { onMounted, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute } from 'vue-router'
+import { io, Socket } from 'socket.io-client'
+import { useSocketStore } from '@/lib/stores/party'
 
 const controller = new AbortController()
 
@@ -18,12 +20,17 @@ async function getStreamUrl() {
   streamUrl.value = url
 }
 
+const socketStore = useSocketStore()
+
 onMounted(() => {
   getStreamUrl()
+  socketStore.connect()
+  socketStore.joinRoom('party-123')
 })
 
 onBeforeRouteLeave(() => {
   controller.abort()
+  socketStore.disconnect()
 })
 </script>
 

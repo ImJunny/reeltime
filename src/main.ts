@@ -9,6 +9,7 @@ import Aura from '@primeuix/themes/aura'
 
 const app = createApp(App)
 
+app.use(router)
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
@@ -23,7 +24,9 @@ app.use(PrimeVue, {
 })
 document.documentElement.classList.add('my-app-dark')
 
-app.use(router)
+// Initialize Pinia and auth store
 app.use(createPinia())
 await useAuthStore().init()
+
+// Mount app
 app.mount('#app')
