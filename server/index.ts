@@ -23,6 +23,9 @@ io.on('connection', (socket) => {
   socket.on('join room', (room) => {
     socket.join(room)
     socket.emit('room joined', room)
+
+    const clientsInRoom = Array.from(io.sockets.adapter.rooms.get(room) || [])
+    io.to(room).emit('room clients', clientsInRoom)
   })
   socket.on('disconnecting', () => {
     socket.rooms.forEach((room) => {

@@ -39,16 +39,22 @@ watch(
 
 const socketStore = useSocketStore()
 
-function onSeeked() {
-  if (socketStore.roomId && videoRef.value) {
-    socketStore.sendTimestamp(videoRef.value.currentTime)
-  }
-}
+let isProgrammaticSeek = false
 
+function onSeeked() {
+  if (!videoRef.value || !socketStore.roomId) return
+
+  if (isProgrammaticSeek) {
+    isProgrammaticSeek = false
+    return
+  }
+
+  console.log('manual seeked', videoRef.value.currentTime)
+  socketStore.sendTimestamp(videoRef.value.currentTime)
+}
 function onPlay() {
   if (socketStore.roomId) socketStore.play()
 }
-
 function onPause() {
   if (socketStore.roomId) socketStore.pause()
 }
@@ -58,21 +64,20 @@ let lastSyncedTime = 0
 watchEffect(() => {
   if (!videoRef.value) return
 
-  // --- Sync timestamp only if it changed significantly ---
   if (socketStore.timestamp) {
-    const diff = Math.abs(videoRef.value.currentTime - socketStore.timestamp)
-    if (diff > 0.5 && Math.abs(lastSyncedTime - socketStore.timestamp) > 0.1) {
+    const diff1 = Math.abs(videoRef.value.currentTime - socketStore.timestamp)
+    const diff2 = Math.abs(lastSyncedTime - socketStore.timestamp)
+    if (diff1 > 0.5 && diff2 > 0.1) {
+      console.log('backed')
+      isProgrammaticSeek = true // mark this as programmatic
+
       videoRef.value.currentTime = socketStore.timestamp
       lastSyncedTime = socketStore.timestamp
     }
   }
 
-  // --- Sync play/pause separately ---
-  if (socketStore.isPlaying && videoRef.value.paused) {
-    videoRef.value.play().catch((err) => console.error(err))
-  } else if (!socketStore.isPlaying && !videoRef.value.paused) {
-    videoRef.value.pause()
-  }
+  if (socketStore.isPlaying && videoRef.value.paused) videoRef.value.play()
+  else if (!socketStore.isPlaying && !videoRef.value.paused) videoRef.value.pause()
 })
 
 onMounted(() => {
