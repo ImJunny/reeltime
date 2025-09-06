@@ -4,14 +4,13 @@ import router from './router'
 import PrimeVue from 'primevue/config'
 import { themePreset } from './lib/themePreset'
 import { createPinia } from 'pinia'
-import Aura from '@primeuix/themes/aura'
 
 const app = createApp(App)
 
 app.use(router)
 app.use(PrimeVue, {
   theme: {
-    preset: Aura,
+    preset: themePreset,
     options: {
       darkModeSelector: '.my-app-dark',
       cssLayer: {

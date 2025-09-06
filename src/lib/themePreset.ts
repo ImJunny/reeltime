@@ -13,16 +13,24 @@ export const themePreset = definePreset(Aura, {
     colorScheme: {
       dark: {
         primary: {
-          300: '#7A7FDC',
-          400: '#585CA8',
-          500: '#3D3D47',
-          600: '#7A7FDC',
+          100: '#E4E5FF',
+          200: '#C3C6F9',
+          300: '#A6A9F5',
+          400: '#868BE8',
+          500: '#595EB3',
+          600: '#454A80',
+          700: '#2E324D',
+          800: '#1C1E2A',
+          900: '#0D0D14',
         },
         surface: {
           300: '#33333E',
           400: '#22222B',
           500: '#181820',
           600: '#13131a',
+          700: '#33333E',
+          800: '#22222B',
+          900: '#181820',
         },
         formField: {
           backgroundColor: '{surface.400}',
