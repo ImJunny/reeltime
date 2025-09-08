@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { type Ref } from 'vue'
+import { ref, watch, type Ref } from 'vue'
 import { Pause, Play } from 'lucide-vue-next'
 import VideoPlayerBar from './VideoPlayerBar.vue'
 import { useSocketStore } from '@/lib/stores/party'
+import { useMediaControls } from '@vueuse/core'
 
 const props = defineProps<{ videoRef: Ref<HTMLVideoElement | null>; togglePlayback: () => void }>()
 const videoRef = props.videoRef
 const socketStore = useSocketStore()
+const { currentTime } = useMediaControls(videoRef)
 </script>
 
 <template>
