@@ -22,12 +22,11 @@ function onClickMovie(movie: any) {
   >
     <div class="relative w-full aspect-[2/3] rounded-sm overflow-hidden">
       <div class="absolute inset-0 z-1 items-center justify-center flex">
-        <div class="absolute top-1 right-1 z-2">
-          <div class="w-full h-full bg-primary-800 opacity-70 absolute rounded-sm" />
-          <div class="flex gap-1 py-[2px] items-center px-2 relative">
-            <Star class="h-3 w-3 fill-amber-300 stroke-0" />
-            <span class="text-white text-xs">{{ movie.vote_average.toFixed(1) }}</span>
-          </div>
+        <div
+          class="absolute top-1 right-1 z-2 bg-primary-800/50 rounded-sm flex px-1 py-[2px] items-center gap-1"
+        >
+          <Star class="h-3 w-3 fill-amber-300 stroke-0" />
+          <span class="text-white text-xs">{{ movie.vote_average.toFixed(1) }}</span>
         </div>
 
         <div

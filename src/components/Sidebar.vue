@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { House, Film, Clapperboard, Users } from 'lucide-vue-next'
+import { useViewStore } from '@/lib/stores/view'
+
+const viewStore = useViewStore()
 
 const router = useRouter()
 
@@ -11,7 +14,6 @@ const links = ref({
     { text: 'Movies', to: '/movies', icon: Film },
     { text: 'TV Shows', to: '/shows', icon: Clapperboard },
   ],
-  personal: [{ text: 'Party', to: '/party', icon: Users }],
 })
 
 function goTo(link) {
@@ -20,7 +22,7 @@ function goTo(link) {
 </script>
 
 <template>
-  <aside class="bg-surface-800 min-w-64">
+  <aside class="bg-surface-800" :class="{ 'w-64': !viewStore.compact }">
     <ul class="p-4">
       <template v-for="[sectionKey, sectionLinks] in Object.entries(links)" :key="sectionKey">
         <li
@@ -33,7 +35,7 @@ function goTo(link) {
           @click="goTo(link)"
         >
           <component :is="link.icon" class="w-5 h-5" />
-          <span class="text-sm">{{ link.text }}</span>
+          <span v-if="!viewStore.compact" class="text-sm">{{ link.text }}</span>
         </li>
         <li v-if="sectionKey !== Object.keys(links).at(-1)" class="border-t border-zinc-700 my-4" />
       </template>

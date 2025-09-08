@@ -8,7 +8,7 @@ export const useSocketStore = defineStore('socket', () => {
 
   const roomId = ref<string | null>(null)
   const timestamp = ref<number>(0)
-  const isPlaying = ref<boolean>(false)
+  const isPlaying = ref<boolean>(true)
   const clients = ref<string[]>([])
 
   // Connect to the server
@@ -54,15 +54,15 @@ export const useSocketStore = defineStore('socket', () => {
     if (!socket.value) return
     socket.value.emit('timestamp change', { room: roomId.value, timestamp })
   }
-  function pause() {
+  function togglePlayback() {
     if (!socket.value) return
-    isPlaying.value = false
-    socket.value.emit('pause', { room: roomId.value })
-  }
-  function play() {
-    if (!socket.value) return
-    isPlaying.value = true
-    socket.value.emit('play', { room: roomId.value })
+    if (isPlaying.value) {
+      socket.value.emit('pause', { room: roomId.value })
+      isPlaying.value = false
+    } else {
+      socket.value.emit('pause', { room: roomId.value })
+      isPlaying.value = true
+    }
   }
 
   return {
@@ -74,8 +74,7 @@ export const useSocketStore = defineStore('socket', () => {
     joinRoom,
     disconnect,
     sendTimestamp,
-    pause,
-    play,
+    togglePlayback,
     clients,
   }
 })

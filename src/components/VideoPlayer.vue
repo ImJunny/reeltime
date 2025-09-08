@@ -2,11 +2,22 @@
 import { ref, onMounted, onBeforeUnmount, watch, watchEffect } from 'vue'
 import Hls from 'hls.js'
 import { useSocketStore } from '@/lib/stores/party'
+import VideoPlayerControls from './VideoPlayerControls.vue'
 
 const props = defineProps<{ url: string }>()
-
 const videoRef = ref<HTMLVideoElement | null>(null)
 const hls = ref<Hls | null>(null)
+const socketStore = useSocketStore()
+
+// Get url to load HLS
+watch(
+  () => props.url,
+  (newUrl) => {
+    if (newUrl) {
+      loadHls(newUrl)
+    }
+  },
+)
 
 // Function to load HLS source
 function loadHls(url: string) {
@@ -27,64 +38,18 @@ function loadHls(url: string) {
   }
 }
 
-// Watch for changes in the URL prop
+// Control playback based on socketStore isPlaying state
 watch(
-  () => props.url,
-  (newUrl) => {
-    if (newUrl) {
-      loadHls(newUrl)
-    }
+  () => socketStore.isPlaying,
+  (isPlaying) => {
+    if (!videoRef.value) return
+    if (isPlaying) videoRef.value.play()
+    else videoRef.value.pause()
   },
 )
 
-const socketStore = useSocketStore()
-
-let isProgrammaticSeek = false
-
-function onSeeked() {
-  if (!videoRef.value || !socketStore.roomId) return
-
-  if (isProgrammaticSeek) {
-    isProgrammaticSeek = false
-    return
-  }
-
-  console.log('manual seeked', videoRef.value.currentTime)
-  socketStore.sendTimestamp(videoRef.value.currentTime)
-}
-function onPlay() {
-  if (socketStore.roomId) socketStore.play()
-}
-function onPause() {
-  if (socketStore.roomId) socketStore.pause()
-}
-
-let lastSyncedTime = 0
-
-watchEffect(() => {
-  if (!videoRef.value) return
-
-  if (socketStore.timestamp) {
-    const diff1 = Math.abs(videoRef.value.currentTime - socketStore.timestamp)
-    const diff2 = Math.abs(lastSyncedTime - socketStore.timestamp)
-    if (diff1 > 0.3 && diff2 > 0.1) {
-      console.log('backed')
-      isProgrammaticSeek = true // mark this as programmatic
-
-      videoRef.value.currentTime = socketStore.timestamp
-      lastSyncedTime = socketStore.timestamp
-    }
-  }
-
-  if (socketStore.isPlaying && videoRef.value.paused) videoRef.value.play()
-  else if (!socketStore.isPlaying && !videoRef.value.paused) videoRef.value.pause()
-})
-
 onMounted(() => {
   loadHls(props.url)
-  videoRef.value?.addEventListener('seeked', onSeeked)
-  videoRef.value?.addEventListener('play', onPlay)
-  videoRef.value?.addEventListener('pause', onPause)
 })
 
 onBeforeUnmount(() => {
@@ -93,17 +58,24 @@ onBeforeUnmount(() => {
     hls.value = null
   }
   if (videoRef.value) {
-    videoRef.value.removeEventListener('seeked', onSeeked)
-    videoRef.value.removeEventListener('play', onPlay)
-    videoRef.value.removeEventListener('pause', onPause)
     videoRef.value.src = ''
     videoRef.value.load()
   }
 })
+
+function togglePlayback() {
+  if (!videoRef.value) return
+  if (socketStore.isPlaying) videoRef.value.pause()
+  else videoRef.value.play()
+  socketStore.togglePlayback()
+}
 </script>
 
 <template>
   <div class="flex justify-center items-center">
-    <video ref="videoRef" controls class="max-w-6xl w-full" />
+    <div class="w-full max-w-6xl relative group">
+      <video ref="videoRef" class="w-full" @click="togglePlayback" autoplay />
+      <VideoPlayerControls :videoRef="videoRef" :togglePlayback="togglePlayback" />
+    </div>
   </div>
 </template>

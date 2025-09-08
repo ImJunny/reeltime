@@ -9,8 +9,10 @@ import Sidebar from './components/Sidebar.vue'
   <div class="flex flex-col h-screen">
     <Header />
     <main class="flex flex-1">
-      <Sidebar />
-      <RouterView class="flex-1" />
+      <Sidebar class="sticky top-16 z-10 h-[calc(100vh-4rem)]" />
+      <div class="flex-1">
+        <RouterView />
+      </div>
     </main>
   </div>
 </template>

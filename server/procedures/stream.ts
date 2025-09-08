@@ -1,5 +1,8 @@
-import { Context, Hono } from 'hono'
+import { Context } from 'hono'
 import puppeteer from 'puppeteer'
+import { db } from '../../server/db/db'
+import { m3u8CacheTable as m3 } from '../../server/db/schema'
+import { eq } from 'drizzle-orm'
 
 // FUNCTION | checks whether url is m3u8
 async function isM3U8(url: string) {
@@ -19,6 +22,17 @@ async function isM3U8(url: string) {
 // FUNCTION | get stream m3u8 url
 export async function getStreamUrl(c: Context) {
   const id = c.req.param('id')
+
+  const cached = await db
+    .select()
+    .from(m3)
+    .where(eq(m3.slug, id))
+    .limit(1)
+    .then((res) => res[0])
+
+  if (cached && Date.now() - new Date(cached.created_at).getTime() < 1000 * 60 * 60) {
+    return c.json({ streamUrl: cached.url }, 200)
+  }
 
   // Create browser setup
   const browser = await puppeteer.launch({
@@ -42,6 +56,7 @@ export async function getStreamUrl(c: Context) {
     await browser.close()
   })
   let timeoutHandle: NodeJS.Timeout
+
   // Create promise that resolves when valid m3u8 found
   const m3u8Promise = new Promise<string>((resolve, reject) => {
     const handleResponse = async (res) => {
@@ -55,6 +70,13 @@ export async function getStreamUrl(c: Context) {
       }, 4000)
 
       if (await isM3U8(url)) {
+        await db
+          .insert(m3)
+          .values({ url, slug: id })
+          .onConflictDoUpdate({
+            target: m3.url,
+            set: { created_at: new Date() },
+          })
         page.off('response', handleResponse)
         resolve(url)
       }
@@ -85,32 +107,6 @@ export async function getStreamUrl(c: Context) {
     await page.evaluate(() => window.scrollBy(0, window.innerHeight))
     await page.mouse.move(100, 100)
     await page.mouse.click(100, 100)
-
-    // Click potential play buttons in all frames
-    for (const frame of page.frames()) {
-      try {
-        const allSelectors = await frame.evaluate(() =>
-          Array.from(document.querySelectorAll('*')).map((el) => {
-            const tag = el.tagName.toLowerCase()
-            const id = el.id ? `#${el.id}` : ''
-            const classes = el.className ? `.${el.className.replace(/\s+/g, '.')}` : ''
-            return `${tag}${id}${classes}`
-          }),
-        )
-        const playSelectors = allSelectors.filter((sel) => /\..*play/i.test(sel))
-        for (const selector of playSelectors) {
-          try {
-            const playBtn = await frame.$(selector)
-            if (playBtn) {
-              await playBtn.click()
-              console.log('Clicked selector:', selector)
-            }
-          } catch {
-            // console.log('Could not click selector:', selector)
-          }
-        }
-      } catch {}
-    }
 
     // Wait for either m3u8 found or abort event
     const streamUrl = await Promise.race([m3u8Promise, abortPromise])

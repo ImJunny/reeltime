@@ -31,13 +31,7 @@ io.on('connection', (socket) => {
       if (room !== socket.id) {
         const roomSockets = new Set(io.sockets.adapter.rooms.get(room) || [])
         roomSockets.delete(socket.id)
-
-        console.log('disconnecting')
         io.to(room).emit('room clients', Array.from(roomSockets))
-
-        if (roomSockets.size === 0) {
-          console.log(`Room ${room} is now empty`)
-        }
       }
     })
   })
