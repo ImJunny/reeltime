@@ -74,7 +74,7 @@ export async function getStreamUrl(c: Context) {
           .insert(m3)
           .values({ url, slug: id })
           .onConflictDoUpdate({
-            target: m3.url,
+            target: m3.slug,
             set: { created_at: new Date() },
           })
         page.off('response', handleResponse)
