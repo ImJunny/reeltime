@@ -21,7 +21,9 @@ async function isM3U8(url: string) {
 
 // FUNCTION | get stream m3u8 url
 export async function getStreamUrl(c: Context) {
-  const id = c.req.param('id')
+  const id = c.req.param('id') as string
+  const year = Number(c.req.query('year')) || null
+  console.log('Using ID:', id, 'Year:', year)
 
   const cached = await db
     .select()

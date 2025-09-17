@@ -9,14 +9,15 @@ import { LoaderCircle } from 'lucide-vue-next'
 const controller = new AbortController()
 
 const route = useRoute()
-const partyId = route.params.id
+const movieId = route.params.id
+const year = movieId.slice(-4) || null
 const streamUrl = ref('')
 
 const loaded = ref(false)
 const error = ref(false)
 async function getStreamUrl() {
   try {
-    const res = await api.get(`/api/stream/url/${partyId}`, {
+    const res = await api.get(`/api/stream/url/${movieId}?year=${year}`, {
       signal: controller.signal,
     })
     const url = res.data.streamUrl

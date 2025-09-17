@@ -3,7 +3,6 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Hls from 'hls.js'
 import { useSocketStore } from '@/lib/stores/party'
 import VideoPlayerControls from './VideoPlayerControls.vue'
-import { useMediaControls } from '@vueuse/core'
 
 const props = defineProps<{ url: string }>()
 const videoRef = ref<HTMLVideoElement | null>(null)
